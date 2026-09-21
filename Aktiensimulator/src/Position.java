@@ -16,11 +16,11 @@ public class Position {
     }
 
     public void addQuantity(int amount) {
-        quantity = quantity + amount;
+        quantity += amount;
     }
 
     public void removeQuantity(int amount) {
-        quantity = quantity - amount;
+        quantity -= amount;
     }
 
     public double getValue() {

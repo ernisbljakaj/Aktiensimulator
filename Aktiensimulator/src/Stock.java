@@ -1,16 +1,23 @@
+import java.util.ArrayList;
+import java.util.List;
+
 public class Stock {
-   private String name;
-   private String ticker;
-   private double price;
-   
-   public Stock(String name, String ticker, double price) {
-       this.name = name;
-       this.ticker = ticker;
-       this.price = price;
-   }
+    private String name;
+    private String ticker;
+    private double price;
+    private List<Double> priceHistory;
+
+    public Stock(String name, String ticker, double price) {
+        this.name = name;
+        this.ticker = ticker;
+        this.price = price;
+        this.priceHistory = new ArrayList<>();
+
+        priceHistory.add(price);
+    }
 
     public String getName() {
-         return name;
+        return name;
     }
 
     public String getTicker() {
@@ -21,14 +28,22 @@ public class Stock {
         return price;
     }
 
+    public List<Double> getPriceHistory() {
+        return priceHistory;
+    }
+
     public void setPrice(double price) {
         this.price = price;
+        priceHistory.add(price);
     }
 
     @Override
-
-    //Verstehe nicht ganz, warum man hier ein format...
     public String toString() {
-        return ticker + " - " + name + ";" + String.format("%.2f CHF", price);
+        return String.format(
+                "%-4s | %-15s | %8.2f CHF",
+                ticker,
+                name,
+                price
+        );
     }
 }
