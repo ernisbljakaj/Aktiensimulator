@@ -29,12 +29,12 @@ public class Stock {
     }
 
     public List<Double> getPriceHistory() {
-        return priceHistory;
+        return List.copyOf(priceHistory);
     }
 
-    public void setPrice(double price) {
-        this.price = price;
-        priceHistory.add(price);
+    public void updatePrice(double newPrice) {
+        this.price = newPrice;
+        priceHistory.add(newPrice);
     }
 
     @Override

@@ -47,7 +47,7 @@ public class Market {
             double newPrice =
                     priceChangeStrategy.calculateNewPrice(oldPrice);
 
-            stock.setPrice(newPrice);
+            stock.updatePrice(newPrice);
         }
     }
 
@@ -59,54 +59,19 @@ public class Market {
             return;
         }
 
-        System.out.println("\n========== KURSGRAFIK ==========");
+        PriceChart chart = new PriceChart(stock.getPriceHistory());
+
+        System.out.println("\n============== KURSGRAFIK ==============");
         System.out.println(stock.getName() + " (" + stock.getTicker() + ")");
-        System.out.println("Aktueller Kurs: "
-                + String.format("%.2f CHF", stock.getPrice()));
+        System.out.printf("Aktueller Kurs: %.2f CHF%n", stock.getPrice());
+        System.out.printf(
+                "Hoch: %.2f CHF | Tief: %.2f CHF | Veränderung seit Tag 1: %+.2f CHF (%+.2f %%)%n",
+                chart.getHighestPrice(),
+                chart.getLowestPrice(),
+                chart.getChange(),
+                chart.getChangePercent()
+        );
 
-        printAsciiChart(stock);
-
-        System.out.println("Tag 1 ------------------> Heute");
-    }
-
-    private void printAsciiChart(Stock stock) {
-        int height = 10;
-
-        double minPrice = Double.MAX_VALUE;
-        double maxPrice = Double.MIN_VALUE;
-
-        for (double price : stock.getPriceHistory()) {
-            if (price < minPrice) {
-                minPrice = price;
-            }
-
-            if (price > maxPrice) {
-                maxPrice = price;
-            }
-        }
-
-        double difference = maxPrice - minPrice;
-
-        if (difference == 0) {
-            difference = 1;
-        }
-
-        for (int row = height; row >= 0; row--) {
-            String line = "";
-
-            for (double price : stock.getPriceHistory()) {
-                int chartPosition = (int) Math.round(
-                        ((price - minPrice) / difference) * height
-                );
-
-                if (chartPosition == row) {
-                    line += "* ";
-                } else {
-                    line += "  ";
-                }
-            }
-
-            System.out.println(line);
-        }
+        chart.printChart();
     }
 }

@@ -1,31 +1,20 @@
 import java.util.Scanner;
 
 public class Main {
+
+    private static final double MAXIMUM_PRICE_CHANGE = 0.10;
+    private static final double STARTING_CAPITAL = 10000.00;
+
     private static Scanner scanner = new Scanner(System.in);
-    /**
-     *  
-     * @param args
-     */
+
     public static void main(String[] args) {
-        PriceChangeStrategy strategy =
-                new RandomPriceChangeStrategy(0.10);
-
-        Market market = new Market(strategy);
-
-        market.addStock(new Stock("SwissTech", "STC", 120.00));
-        market.addStock(new Stock("GreenEnergy", "GRE", 80.00));
-        market.addStock(new Stock("FoodWorld", "FOO", 50.00));
-        market.addStock(new Stock("AutoFuture", "ATF", 200.00));
-
-        Investor investor = new Investor(10000.00);
+        Market market = createMarket();
+        Investor investor = new Investor(STARTING_CAPITAL);
 
         int day = 1;
         boolean running = true;
 
-        System.out.println("========================================");
-        System.out.println("       AKTIENMARKT-SIMULATOR");
-        System.out.println("========================================");
-        System.out.println("Startkapital: 10'000.00 CHF");
+        showTitle();
 
         while (running) {
             showMenu(day, investor);
@@ -72,6 +61,27 @@ public class Main {
         }
 
         scanner.close();
+    }
+
+    private static Market createMarket() {
+        PriceChangeStrategy strategy =
+                new RandomPriceChangeStrategy(MAXIMUM_PRICE_CHANGE);
+
+        Market market = new Market(strategy);
+
+        market.addStock(new Stock("SwissTech", "STC", 120.00));
+        market.addStock(new Stock("GreenEnergy", "GRE", 80.00));
+        market.addStock(new Stock("FoodWorld", "FOO", 50.00));
+        market.addStock(new Stock("AutoFuture", "ATF", 200.00));
+
+        return market;
+    }
+
+    private static void showTitle() {
+        System.out.println("========================================");
+        System.out.println("       AKTIENMARKT-SIMULATOR");
+        System.out.println("========================================");
+        System.out.printf("Startkapital: %.2f CHF%n", STARTING_CAPITAL);
     }
 
     private static void showMenu(int day, Investor investor) {
