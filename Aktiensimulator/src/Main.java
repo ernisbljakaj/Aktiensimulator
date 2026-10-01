@@ -1,11 +1,11 @@
-import java.util.Scanner;
-
 public class Main {
 
     private static final double MAXIMUM_PRICE_CHANGE = 0.10;
     private static final double STARTING_CAPITAL = 10000.00;
+    private static final int LOWEST_MENU_CHOICE = 1;
+    private static final int HIGHEST_MENU_CHOICE = 7;
 
-    private static Scanner scanner = new Scanner(System.in);
+    private static final Console console = new Console();
 
     public static void main(String[] args) {
         Market market = createMarket();
@@ -14,12 +14,16 @@ public class Main {
         int day = 1;
         boolean running = true;
 
-        showTitle();
-
         while (running) {
+            console.clearScreen();
+            showTitle();
             showMenu(day, investor);
 
-            int choice = readInt("Auswahl: ");
+            int choice = console.readChoice(
+                    "Auswahl: ",
+                    LOWEST_MENU_CHOICE,
+                    HIGHEST_MENU_CHOICE
+            );
 
             switch (choice) {
                 case 1:
@@ -54,13 +58,10 @@ public class Main {
                     showEndResult(investor, day);
                     running = false;
                     break;
-
-                default:
-                    System.out.println("Ungültige Auswahl. Bitte 1 bis 7 wählen.");
             }
         }
 
-        scanner.close();
+        console.close();
     }
 
     private static Market createMarket() {
@@ -106,7 +107,7 @@ public class Main {
     private static void buyStock(Market market, Investor investor) {
         market.showStocks();
 
-        String ticker = readText(
+        String ticker = console.readText(
                 "Ticker der Aktie zum Kaufen eingeben (z. B. STC): "
         ).toUpperCase();
 
@@ -117,7 +118,9 @@ public class Main {
             return;
         }
 
-        int quantity = readInt("Wie viele Stück möchtest du kaufen? ");
+        int quantity = console.readPositiveNumber(
+                "Wie viele Stück möchtest du kaufen? "
+        );
 
         boolean success = investor.buy(stock, quantity);
 
@@ -138,7 +141,7 @@ public class Main {
     private static void sellStock(Market market, Investor investor) {
         market.showStocks();
 
-        String ticker = readText(
+        String ticker = console.readText(
                 "Ticker der Aktie zum Verkaufen eingeben (z. B. STC): "
         ).toUpperCase();
 
@@ -149,7 +152,9 @@ public class Main {
             return;
         }
 
-        int quantity = readInt("Wie viele Stück möchtest du verkaufen? ");
+        int quantity = console.readPositiveNumber(
+                "Wie viele Stück möchtest du verkaufen? "
+        );
 
         boolean success = investor.sell(stock, quantity);
 
@@ -170,7 +175,7 @@ public class Main {
     private static void showChart(Market market) {
         market.showStocks();
 
-        String ticker = readText(
+        String ticker = console.readText(
                 "Ticker für die Kursgrafik eingeben (z. B. STC): "
         ).toUpperCase();
 
@@ -192,25 +197,5 @@ public class Main {
                 investor.getTotalWealth()
         );
         System.out.println("========================================");
-    }
-
-    private static int readInt(String message) {
-        while (true) {
-            System.out.print(message);
-
-            if (scanner.hasNextInt()) {
-                int number = scanner.nextInt();
-                scanner.nextLine();
-                return number;
-            }
-
-            System.out.println("Fehler: Bitte eine ganze Zahl eingeben.");
-            scanner.nextLine();
-        }
-    }
-
-    private static String readText(String message) {
-        System.out.print(message);
-        return scanner.nextLine();
     }
 }
