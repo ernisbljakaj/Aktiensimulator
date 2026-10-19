@@ -12,6 +12,32 @@ public class Console {
     }
 
     public void clearScreen() {
+        System.out.flush();
+
+        if (isWindows()) {
+            clearWithSystemCommand();
+        } else {
+            clearWithAnsi();
+        }
+    }
+
+    private boolean isWindows() {
+        String osName = System.getProperty("os.name", "");
+        return osName.toLowerCase().contains("win");
+    }
+
+    private void clearWithSystemCommand() {
+        try {
+            ProcessBuilder builder = new ProcessBuilder("cmd", "/c", "cls");
+            builder.redirectOutput(ProcessBuilder.Redirect.INHERIT);
+            builder.redirectError(ProcessBuilder.Redirect.INHERIT);
+            builder.start().waitFor();
+        } catch (Exception problem) {
+            clearWithAnsi();
+        }
+    }
+
+    private void clearWithAnsi() {
         System.out.print(MOVE_CURSOR_TO_TOP + CLEAR_ENTIRE_SCREEN);
         System.out.flush();
     }
@@ -51,6 +77,30 @@ public class Console {
                             + " eingeben."
             );
         }
+    }
+
+    public boolean readConfirmation(String message) {
+        while (true) {
+            String input = readText(message).trim().toLowerCase();
+
+            if (input.equals("j") || input.equals("ja")
+                    || input.equals("y") || input.equals("yes")) {
+                return true;
+            }
+
+            if (input.equals("n") || input.equals("nein")
+                    || input.equals("no")) {
+                return false;
+            }
+
+            System.out.println(
+                    "Fehler: Bitte 'j' für ja oder 'n' für nein eingeben."
+            );
+        }
+    }
+
+    public void waitForEnter(String message) {
+        readText(message);
     }
 
     public int readPositiveNumber(String message) {

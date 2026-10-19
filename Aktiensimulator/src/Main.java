@@ -5,19 +5,24 @@ public class Main {
     private static final int LOWEST_MENU_CHOICE = 1;
     private static final int HIGHEST_MENU_CHOICE = 7;
 
+    private static final int DAYS_PER_LEVEL = 30;
+    private static final double LEVEL_GOAL_STEP = 1000.00;
+
     private static final Console console = new Console();
 
     public static void main(String[] args) {
         Market market = createMarket();
         Investor investor = new Investor(STARTING_CAPITAL);
 
+        int level = 1;
         int day = 1;
+        double goal = goalForLevel(level);
         boolean running = true;
 
         while (running) {
             console.clearScreen();
             showTitle();
-            showMenu(day, investor);
+            showMenu(day, level, goal, investor);
 
             int choice = console.readChoice(
                     "Auswahl: ",
@@ -25,12 +30,14 @@ public class Main {
                     HIGHEST_MENU_CHOICE
             );
 
+            console.clearScreen();
+
             switch (choice) {
                 case 1:
                     market.showStocks();
                     break;
 
-                case 2:
+               case  2:
                     buyStock(market, investor);
                     break;
 
@@ -50,14 +57,31 @@ public class Main {
                     market.nextDay();
                     day++;
 
-                    System.out.println("\nEin neuer Tag beginnt.");
-                    System.out.println("Alle Aktienkurse wurden verändert.");
+                    if (day > DAYS_PER_LEVEL) {
+                        running = finishLevel(investor, level, goal);
+
+                        if (running) {
+                            level++;
+                            day = 1;
+                            goal = goalForLevel(level);
+                        }
+                    } else {
+                        System.out.println("\nEin neuer Tag beginnt.");
+                        System.out.println("Alle Aktienkurse wurden verändert.");
+                    }
                     break;
 
                 case 7:
-                    showEndResult(investor, day);
+                    showEndResult(investor, level, day);
                     running = false;
                     break;
+            }
+
+            if (running) {
+                console.waitForEnter(
+                        "\nDrücke Enter, um den Bildschirm zu leeren "
+                                + "und zum Menü zurückzukehren..."
+                );
             }
         }
 
@@ -85,14 +109,28 @@ public class Main {
         System.out.printf("Startkapital: %.2f CHF%n", STARTING_CAPITAL);
     }
 
-    private static void showMenu(int day, Investor investor) {
+    private static void showMenu(int day, int level, double goal, Investor investor) {
+        double wealth = investor.getTotalWealth();
+
         System.out.println("\n========================================");
-        System.out.println("Tag: " + day);
-        System.out.printf("Bargeld: %.2f CHF%n", investor.getCash());
         System.out.printf(
-                "Gesamtvermögen: %.2f CHF%n",
-                investor.getTotalWealth()
+                "Level: %d | Tag: %d von %d%n",
+                level,
+                day,
+                DAYS_PER_LEVEL
         );
+        System.out.printf("Ziel dieses Levels: %.2f CHF%n", goal);
+        System.out.println("----------------------------------------");
+        System.out.printf("Bargeld: %.2f CHF%n", investor.getCash());
+        System.out.printf("Gesamtvermögen: %.2f CHF%n", wealth);
+
+        if (wealth >= goal) {
+            System.out.println("Ziel erreicht! Halte durch bis Tag "
+                    + DAYS_PER_LEVEL + ".");
+        } else {
+            System.out.printf("Noch nötig: %.2f CHF%n", goal - wealth);
+        }
+
         System.out.println("----------------------------------------");
         System.out.println("1. Aktienmarkt anzeigen");
         System.out.println("2. Aktie kaufen");
@@ -102,6 +140,45 @@ public class Main {
         System.out.println("6. Nächster Tag");
         System.out.println("7. Spiel beenden");
         System.out.println("========================================");
+    }
+
+    private static double goalForLevel(int level) {
+        return STARTING_CAPITAL + (level * LEVEL_GOAL_STEP);
+    }
+
+    private static boolean finishLevel(Investor investor, int level, double goal) {
+        double wealth = investor.getTotalWealth();
+
+        System.out.println("\n========================================");
+
+        if (wealth >= goal) {
+            System.out.printf("     LEVEL %d GESCHAFFT!%n", level);
+            System.out.println("========================================");
+            System.out.printf("Ziel von %.2f CHF erreicht.%n", goal);
+            System.out.printf("Gesamtvermögen: %.2f CHF%n", wealth);
+            System.out.printf(
+                    "Neues Ziel für Level %d: %.2f CHF%n",
+                    level + 1,
+                    goalForLevel(level + 1)
+            );
+            System.out.println("========================================");
+
+            return true;
+        }
+
+        System.out.println("              VERLOREN");
+        System.out.println("========================================");
+        System.out.printf(
+                "Du hast Level %d nach %d Tagen nicht geschafft.%n",
+                level,
+                DAYS_PER_LEVEL
+        );
+        System.out.printf("Ziel:     %.2f CHF%n", goal);
+        System.out.printf("Erreicht: %.2f CHF%n", wealth);
+        System.out.printf("Fehlend:  %.2f CHF%n", goal - wealth);
+        System.out.println("========================================");
+
+        return false;
     }
 
     private static void buyStock(Market market, Investor investor) {
@@ -122,11 +199,37 @@ public class Main {
                 "Wie viele Stück möchtest du kaufen? "
         );
 
+        double pricePerShare = stock.getPrice();
+        double totalCost = pricePerShare * quantity;
+        double cashAfterBuy = investor.getCash() - totalCost;
+
+        System.out.println("\n========================================");
+        System.out.println("           KAUF BESTÄTIGEN");
+        System.out.println("========================================");
+        System.out.println(
+                "Aktie: " + stock.getName() + " (" + stock.getTicker() + ")"
+        );
+        System.out.printf("Kurs pro Stück: %.2f CHF%n", pricePerShare);
+        System.out.printf("Anzahl:         %d Stück%n", quantity);
+        System.out.printf("Gesamtkosten:   %.2f CHF%n", totalCost);
+        System.out.printf("Bargeld danach: %.2f CHF%n", cashAfterBuy);
+
+        if (cashAfterBuy < 0) {
+            System.out.println(
+                    "Warnung: Du hast nicht genug Bargeld für diesen Kauf!"
+            );
+        }
+
+        System.out.println("========================================");
+
+        if (!console.readConfirmation("Kauf durchführen? (j/n): ")) {
+            System.out.println("\nKauf abgebrochen.");
+            return;
+        }
+
         boolean success = investor.buy(stock, quantity);
 
         if (success) {
-            double totalCost = stock.getPrice() * quantity;
-
             System.out.println("\nKauf erfolgreich:");
             System.out.println(quantity + " Stück von "
                     + stock.getTicker() + " gekauft.");
@@ -182,11 +285,15 @@ public class Main {
         market.showChart(ticker);
     }
 
-    private static void showEndResult(Investor investor, int day) {
+    private static void showEndResult(Investor investor, int level, int day) {
         System.out.println("\n========================================");
         System.out.println("             SPIEL BEENDET");
         System.out.println("========================================");
-        System.out.println("Gespielte Tage: " + day);
+        System.out.printf("Beendet in Level %d am Tag %d von %d%n",
+                level,
+                day,
+                DAYS_PER_LEVEL
+        );
         System.out.printf("Bargeld: %.2f CHF%n", investor.getCash());
         System.out.printf(
                 "Wert der Aktien: %.2f CHF%n",
