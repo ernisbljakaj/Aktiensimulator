@@ -16,7 +16,7 @@ public class PriceChart {
     }
 
     public void printChart() {
-        if (prices.size() < 2) {
+        if (prices.isEmpty()) {
             System.out.println("Für diese Aktie gibt es noch keinen Kursverlauf.");
             return;
         }
@@ -32,6 +32,13 @@ public class PriceChart {
         }
 
         printDayAxis();
+
+        if (prices.size() == 1) {
+            System.out.println(
+                    "\nDas ist der Kurs vom Tag 1. Ab Tag 2 siehst du hier "
+                            + "den Verlauf als Grafik."
+            );
+        }
     }
 
     public double getHighestPrice() {
@@ -117,7 +124,7 @@ public class PriceChart {
 
     private int getColumn(int index) {
         if (prices.size() == 1) {
-            return 0;
+            return CHART_WIDTH / 2;
         }
 
         return (int) Math.round(
@@ -150,6 +157,14 @@ public class PriceChart {
     }
 
     private String getPriceLabel(int row, double lowestPrice, double highestPrice) {
+        if (lowestPrice == highestPrice) {
+            if (row == CHART_HEIGHT / 2) {
+                return formatPrice(highestPrice);
+            }
+
+            return " ".repeat(LABEL_WIDTH);
+        }
+
         if (row == 0) {
             return formatPrice(highestPrice);
         }
@@ -183,11 +198,20 @@ public class PriceChart {
         int indent = LABEL_WIDTH + 2;
         String firstLabel = "Tag 1";
         String lastLabel = "Tag " + prices.size();
-        int gap = CHART_WIDTH - lastLabel.length() - firstLabel.length();
 
         System.out.println(
                 " ".repeat(indent) + "+" + "-".repeat(CHART_WIDTH - 1)
         );
+
+        if (prices.size() == 1) {
+            int padding = (CHART_WIDTH - firstLabel.length()) / 2;
+
+            System.out.println(" ".repeat(indent + padding) + firstLabel);
+            return;
+        }
+
+        int gap = CHART_WIDTH - lastLabel.length() - firstLabel.length();
+
         System.out.println(
                 " ".repeat(indent)
                         + firstLabel
