@@ -29,8 +29,7 @@ public class Market {
                 "%-4s | %-15s | %-12s%n",
                 "ID",
                 "Aktie",
-                "Kurs"
-        );
+                "Kurs");
 
         System.out.println("----------------------------------------------");
 
@@ -44,8 +43,7 @@ public class Market {
     public void nextDay() {
         for (Stock stock : stocks.values()) {
             double oldPrice = stock.getPrice();
-            double newPrice =
-                    priceChangeStrategy.calculateNewPrice(oldPrice);
+            double newPrice = priceChangeStrategy.calculateNewPrice(oldPrice);
 
             stock.updatePrice(newPrice);
         }
@@ -69,8 +67,7 @@ public class Market {
                 chart.getHighestPrice(),
                 chart.getLowestPrice(),
                 chart.getChange(),
-                chart.getChangePercent()
-        );
+                chart.getChangePercent());
 
         chart.printChart();
     }

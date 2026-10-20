@@ -27,8 +27,7 @@ public class PriceChart {
 
         for (int row = 0; row < CHART_HEIGHT; row++) {
             System.out.println(
-                    getPriceLabel(row, lowestPrice, highestPrice) + " |" + asText(plot[row])
-            );
+                    getPriceLabel(row, lowestPrice, highestPrice) + " |" + asText(plot[row]));
         }
 
         printDayAxis();
@@ -36,8 +35,7 @@ public class PriceChart {
         if (prices.size() == 1) {
             System.out.println(
                     "\nDas ist der Kurs vom Tag 1. Ab Tag 2 siehst du hier "
-                            + "den Verlauf als Grafik."
-            );
+                            + "den Verlauf als Grafik.");
         }
     }
 
@@ -102,8 +100,7 @@ public class PriceChart {
             int fromIndex,
             int toIndex,
             double lowestPrice,
-            double highestPrice
-    ) {
+            double highestPrice) {
         int fromColumn = getColumn(fromIndex);
         int toColumn = getColumn(toIndex);
         int fromRow = getRow(fromIndex, lowestPrice, highestPrice);
@@ -128,8 +125,7 @@ public class PriceChart {
         }
 
         return (int) Math.round(
-                index * (double) (CHART_WIDTH - 1) / (prices.size() - 1)
-        );
+                index * (double) (CHART_WIDTH - 1) / (prices.size() - 1));
     }
 
     private int getRow(int index, double lowestPrice, double highestPrice) {
@@ -140,8 +136,7 @@ public class PriceChart {
         }
 
         return (int) Math.round(
-                (highestPrice - prices.get(index)) / span * (CHART_HEIGHT - 1)
-        );
+                (highestPrice - prices.get(index)) / span * (CHART_HEIGHT - 1));
     }
 
     private char getLineSymbol(int columnChange, int rowChange) {
@@ -200,8 +195,7 @@ public class PriceChart {
         String lastLabel = "Tag " + prices.size();
 
         System.out.println(
-                " ".repeat(indent) + "+" + "-".repeat(CHART_WIDTH - 1)
-        );
+                " ".repeat(indent) + "+" + "-".repeat(CHART_WIDTH - 1));
 
         if (prices.size() == 1) {
             int padding = (CHART_WIDTH - firstLabel.length()) / 2;
@@ -216,7 +210,6 @@ public class PriceChart {
                 " ".repeat(indent)
                         + firstLabel
                         + " ".repeat(Math.max(gap, 1))
-                        + lastLabel
-        );
+                        + lastLabel);
     }
 }

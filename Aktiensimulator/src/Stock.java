@@ -43,7 +43,6 @@ public class Stock {
                 "%-4s | %-15s | %8.2f CHF",
                 ticker,
                 name,
-                price
-        );
+                price);
     }
 }

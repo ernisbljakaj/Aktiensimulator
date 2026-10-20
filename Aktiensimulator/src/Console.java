@@ -55,8 +55,7 @@ public class Console {
                 return Integer.parseInt(readLine().trim());
             } catch (NumberFormatException wrongInput) {
                 System.out.println(
-                        "Fehler: Bitte eine ganze Zahl eingeben, zum Beispiel 10."
-                );
+                        "Fehler: Bitte eine ganze Zahl eingeben, zum Beispiel 10.");
             }
         }
     }
@@ -74,8 +73,7 @@ public class Console {
                             + lowestChoice
                             + " bis "
                             + highestChoice
-                            + " eingeben."
-            );
+                            + " eingeben.");
         }
     }
 
@@ -94,8 +92,7 @@ public class Console {
             }
 
             System.out.println(
-                    "Fehler: Bitte 'j' für ja oder 'n' für nein eingeben."
-            );
+                    "Fehler: Bitte 'j' für ja oder 'n' für nein eingeben.");
         }
     }
 
@@ -112,8 +109,7 @@ public class Console {
             }
 
             System.out.println(
-                    "Fehler: Bitte eine Zahl grösser als 0 eingeben."
-            );
+                    "Fehler: Bitte eine Zahl grösser als 0 eingeben.");
         }
     }
 
