@@ -22,6 +22,25 @@ public class Main {
         while (running) {
             console.clearScreen();
             showTitle();
+
+            if (investor.getTotalWealth() >= goal) {
+                showLevelSuccess(investor, level, day, goal);
+
+                level++;
+                day = 1;
+                goal = goalForLevel(level);
+
+                console.waitForEnter(
+                        "\nDrücke Enter, um zum nächsten Level zu kommen...");
+                continue;
+            }
+
+            if (day > DAYS_PER_LEVEL) {
+                showGameOver(investor, level, goal);
+                running = false;
+                break;
+            }
+
             showMenu(day, level, goal, investor);
 
             int choice = console.readChoice(
@@ -56,15 +75,7 @@ public class Main {
                     market.nextDay();
                     day++;
 
-                    if (day > DAYS_PER_LEVEL) {
-                        running = finishLevel(investor, level, goal);
-
-                        if (running) {
-                            level++;
-                            day = 1;
-                            goal = goalForLevel(level);
-                        }
-                    } else {
+                    if (!levelFinished(investor, goal, day)) {
                         System.out.println("\nEin neuer Tag beginnt.");
                         System.out.println("Alle Aktienkurse wurden verändert.");
                     }
@@ -76,7 +87,7 @@ public class Main {
                     break;
             }
 
-            if (running) {
+            if (running && !levelFinished(investor, goal, day)) {
                 console.waitForEnter(
                         "\nDrücke Enter, um den Bildschirm zu leeren "
                                 + "und zum Menü zurückzukehren...");
@@ -84,6 +95,10 @@ public class Main {
         }
 
         console.close();
+    }
+
+    private static boolean levelFinished(Investor investor, double goal, int day) {
+        return investor.getTotalWealth() >= goal || day > DAYS_PER_LEVEL;
     }
 
     private static Market createMarket() {
@@ -119,13 +134,7 @@ public class Main {
         System.out.println("----------------------------------------");
         System.out.printf("Bargeld: %.2f CHF%n", investor.getCash());
         System.out.printf("Gesamtvermögen: %.2f CHF%n", wealth);
-
-        if (wealth >= goal) {
-            System.out.println("Ziel erreicht! Halte durch bis Tag "
-                    + DAYS_PER_LEVEL + ".");
-        } else {
-            System.out.printf("Noch nötig: %.2f CHF%n", goal - wealth);
-        }
+        System.out.printf("Noch nötig: %.2f CHF%n", goal - wealth);
 
         System.out.println("----------------------------------------");
         System.out.println("1. Aktienmarkt anzeigen");
@@ -142,37 +151,44 @@ public class Main {
         return STARTING_CAPITAL + (level * LEVEL_GOAL_STEP);
     }
 
-    private static boolean finishLevel(Investor investor, int level, double goal) {
+    private static void showLevelSuccess(
+            Investor investor,
+            int level,
+            int day,
+            double goal) {
+        int dayShown = Math.min(day, DAYS_PER_LEVEL);
         double wealth = investor.getTotalWealth();
 
         System.out.println("\n========================================");
+        System.out.printf("     LEVEL %d GESCHAFFT!%n", level);
+        System.out.println("========================================");
+        System.out.printf(
+                "Ziel von %.2f CHF am Tag %d von %d erreicht.%n",
+                goal,
+                dayShown,
+                DAYS_PER_LEVEL);
+        System.out.printf("Gesamtvermögen: %.2f CHF%n", wealth);
+        System.out.printf(
+                "Neues Ziel für Level %d: %.2f CHF%n",
+                level + 1,
+                goalForLevel(level + 1));
+        System.out.println("========================================");
+    }
 
-        if (wealth >= goal) {
-            System.out.printf("     LEVEL %d GESCHAFFT!%n", level);
-            System.out.println("========================================");
-            System.out.printf("Ziel von %.2f CHF erreicht.%n", goal);
-            System.out.printf("Gesamtvermögen: %.2f CHF%n", wealth);
-            System.out.printf(
-                    "Neues Ziel für Level %d: %.2f CHF%n",
-                    level + 1,
-                    goalForLevel(level + 1));
-            System.out.println("========================================");
+    private static void showGameOver(Investor investor, int level, double goal) {
+        double wealth = investor.getTotalWealth();
 
-            return true;
-        }
-
+        System.out.println("\n========================================");
         System.out.println("              VERLOREN");
         System.out.println("========================================");
         System.out.printf(
-                "Du hast Level %d nach %d Tagen nicht geschafft.%n",
+                "Du hast Level %d von %d nicht geschafft.%n",
                 level,
                 DAYS_PER_LEVEL);
         System.out.printf("Ziel:     %.2f CHF%n", goal);
         System.out.printf("Erreicht: %.2f CHF%n", wealth);
         System.out.printf("Fehlend:  %.2f CHF%n", goal - wealth);
         System.out.println("========================================");
-
-        return false;
     }
 
     private static void buyStock(Market market, Investor investor) {
